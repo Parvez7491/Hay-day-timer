@@ -13,211 +13,162 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #0f0e17;
-      --surface: #181728;
-      --card: #1e1c30;
-      --accent: #f4a227;
-      --accent2: #e8734a;
-      --green: #52c78a;
-      --text: #fffffe;
-      --muted: #8b8da8;
-      --border: rgba(244,162,39,0.12);
+      --bg:#0f0e17; --surface:#181728; --card:#1e1c30;
+      --accent:#f4a227; --accent2:#e8734a; --green:#52c78a;
+      --red:#e05c5c; --text:#fffffe; --muted:#8b8da8;
+      --border:rgba(244,162,39,0.12);
     }
-
-    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-    html,body { height:100%; overflow:hidden; }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    html,body{height:100%;overflow:hidden;}
+    body{
+      font-family:'DM Sans',sans-serif;
+      background:var(--bg);color:var(--text);
+      display:flex;flex-direction:column;
+      align-items:center;justify-content:center;position:relative;
     }
-    body::after {
-      content:'';
-      position:fixed; inset:0;
+    body::after{
+      content:'';position:fixed;inset:0;
       background:
-        radial-gradient(ellipse 60% 40% at 85% 5%,  rgba(244,162,39,0.09) 0%,transparent 60%),
-        radial-gradient(ellipse 50% 40% at 10% 95%, rgba(232,115,74,0.08) 0%,transparent 60%);
-      pointer-events:none; z-index:0;
+        radial-gradient(ellipse 60% 40% at 85% 5%,rgba(244,162,39,0.09) 0%,transparent 60%),
+        radial-gradient(ellipse 50% 40% at 10% 95%,rgba(232,115,74,0.08) 0%,transparent 60%);
+      pointer-events:none;z-index:0;
     }
+    .blob{position:fixed;border-radius:50%;filter:blur(90px);opacity:0.07;pointer-events:none;}
+    .b1{width:260px;height:260px;background:var(--accent);top:-70px;right:-70px;}
+    .b2{width:220px;height:220px;background:var(--accent2);bottom:-60px;left:-60px;}
 
-    .blob {
-      position:fixed; border-radius:50%;
-      filter:blur(90px); opacity:0.07; pointer-events:none;
-    }
-    .b1 { width:260px;height:260px; background:var(--accent);  top:-70px;  right:-70px; }
-    .b2 { width:220px;height:220px; background:var(--accent2); bottom:-60px; left:-60px; }
-
-    .container {
-      position:relative; z-index:1;
-      width:100%; max-width:400px;
-      padding:28px 22px;
-      display:flex; flex-direction:column; gap:18px;
+    .container{
+      position:relative;z-index:1;
+      width:100%;max-width:400px;
+      padding:24px 22px;
+      display:flex;flex-direction:column;gap:16px;
     }
 
     /* HEADER */
-    .header { text-align:center; }
-    .header .icon {
-      font-size:42px; display:block; margin-bottom:8px;
-      animation:float 3.5s ease-in-out infinite;
+    .header{text-align:center;}
+    .header .icon{font-size:40px;display:block;margin-bottom:8px;animation:float 3.5s ease-in-out infinite;}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+    .header h1{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.5px;}
+    .header p{font-size:13px;color:var(--muted);margin-top:3px;}
+
+    /* NOTIFICATION BANNER */
+    .notif-banner{
+      border-radius:16px;padding:14px 16px;
+      display:flex;align-items:center;gap:12px;
+      border:1px solid;
+      transition:all 0.3s;
     }
-    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
-    .header h1 {
-      font-family:'Syne',sans-serif; font-size:22px;
-      font-weight:800; letter-spacing:-0.5px;
+    .notif-banner.granted{background:rgba(82,199,138,0.08);border-color:rgba(82,199,138,0.25);}
+    .notif-banner.denied {background:rgba(224,92,92,0.08); border-color:rgba(224,92,92,0.25);}
+    .notif-banner.pending{background:rgba(244,162,39,0.08);border-color:rgba(244,162,39,0.25);}
+    .notif-icon{font-size:22px;flex-shrink:0;}
+    .notif-text{flex:1;}
+    .notif-title{font-size:13px;font-weight:600;color:var(--text);}
+    .notif-sub{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4;}
+    .notif-btn{
+      background:linear-gradient(135deg,#f4a227,#e8734a);
+      border:none;border-radius:10px;
+      padding:8px 14px;font-family:'Syne',sans-serif;
+      font-size:12px;font-weight:700;color:#0f0e17;
+      cursor:pointer;white-space:nowrap;flex-shrink:0;
     }
-    .header p { font-size:13px; color:var(--muted); margin-top:3px; }
 
     /* STATUS */
-    .status-card {
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:22px;
-      padding:22px 20px;
-      text-align:center;
-      position:relative; overflow:hidden;
-      transition:border-color 0.4s;
+    .status-card{
+      background:var(--card);border:1px solid var(--border);
+      border-radius:22px;padding:20px;text-align:center;
+      position:relative;overflow:hidden;transition:border-color 0.4s;
     }
-    .status-card.running { border-color:rgba(82,199,138,0.3); }
-    .status-card::before {
-      content:''; position:absolute; top:0;left:0;right:0; height:2px;
+    .status-card.running{border-color:rgba(82,199,138,0.3);}
+    .status-card::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:2px;
       background:linear-gradient(90deg,transparent,var(--accent),transparent);
-      opacity:0; transition:opacity 0.5s;
+      opacity:0;transition:opacity 0.5s;
     }
-    .status-card.running::before { opacity:1; }
-
-    .slabel {
-      font-size:10px; font-weight:500; letter-spacing:2.5px;
-      text-transform:uppercase; color:var(--muted); margin-bottom:10px;
-    }
-    .smain {
-      font-family:'Syne',sans-serif; font-size:17px; font-weight:700;
-      display:flex; align-items:center; justify-content:center; gap:8px;
-      min-height:26px;
-    }
-    .smain.idle   { color:var(--muted); }
-    .smain.active { color:var(--green); }
-
-    .dot {
-      width:9px;height:9px; border-radius:50%;
-      background:var(--green); flex-shrink:0; position:relative;
-    }
-    .dot::after {
-      content:''; position:absolute; inset:-4px; border-radius:50%;
-      background:var(--green); opacity:0.22;
-      animation:ripple 1.6s ease-out infinite;
-    }
-    @keyframes ripple { 0%{transform:scale(1);opacity:0.22} 100%{transform:scale(2.8);opacity:0} }
-
-    .cycles-row { margin-top:10px; font-size:12px; color:var(--muted); }
-    .cycles-row strong { color:var(--accent); font-family:'Syne',sans-serif; }
+    .status-card.running::before{opacity:1;}
+    .slabel{font-size:10px;font-weight:500;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+    .smain{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;
+      display:flex;align-items:center;justify-content:center;gap:8px;min-height:24px;}
+    .smain.idle{color:var(--muted);}
+    .smain.active{color:var(--green);}
+    .dot{width:9px;height:9px;border-radius:50%;background:var(--green);flex-shrink:0;position:relative;}
+    .dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;background:var(--green);opacity:0.22;animation:ripple 1.6s ease-out infinite;}
+    @keyframes ripple{0%{transform:scale(1);opacity:0.22}100%{transform:scale(2.8);opacity:0}}
+    .cycles-row{margin-top:8px;font-size:12px;color:var(--muted);}
+    .cycles-row strong{color:var(--accent);font-family:'Syne',sans-serif;}
 
     /* SETTINGS */
-    .settings-card {
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:22px;
-      padding:20px;
-      display:flex; flex-direction:column; gap:16px;
+    .settings-card{
+      background:var(--card);border:1px solid var(--border);
+      border-radius:22px;padding:18px;
+      display:flex;flex-direction:column;gap:14px;
     }
-    .stitle {
-      font-size:10px; font-weight:500; letter-spacing:2.5px;
-      text-transform:uppercase; color:var(--muted);
-    }
-    .srow {
-      display:flex; align-items:center; justify-content:space-between;
-    }
-    .sinfo { flex:1; }
-    .sname { font-size:14px; font-weight:500; color:var(--text); }
-    .sdesc { font-size:11px; color:var(--muted); margin-top:2px; }
-
-    .stepper {
-      display:flex; align-items:center;
-      background:var(--surface);
-      border-radius:13px; overflow:hidden;
+    .stitle{font-size:10px;font-weight:500;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);}
+    .srow{display:flex;align-items:center;justify-content:space-between;}
+    .sinfo{flex:1;}
+    .sname{font-size:14px;font-weight:500;color:var(--text);}
+    .sdesc{font-size:11px;color:var(--muted);margin-top:2px;}
+    .stepper{
+      display:flex;align-items:center;
+      background:var(--surface);border-radius:13px;overflow:hidden;
       border:1px solid rgba(255,255,255,0.05);
     }
-    .stepper button {
-      background:none; border:none; color:var(--accent);
-      font-size:20px; width:36px; height:36px;
-      cursor:pointer; display:flex; align-items:center; justify-content:center;
+    .stepper button{
+      background:none;border:none;color:var(--accent);
+      font-size:20px;width:36px;height:36px;
+      cursor:pointer;display:flex;align-items:center;justify-content:center;
       transition:background 0.15s;
     }
-    .stepper button:active { background:rgba(244,162,39,0.12); }
-    .stepper .val {
-      font-family:'Syne',sans-serif; font-size:13px; font-weight:700;
-      color:var(--text); min-width:48px; text-align:center;
-    }
-    .divider { height:1px; background:rgba(255,255,255,0.05); margin:0 -20px; }
+    .stepper button:active{background:rgba(244,162,39,0.12);}
+    .stepper .val{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text);min-width:48px;text-align:center;}
+    .divider{height:1px;background:rgba(255,255,255,0.05);margin:0 -18px;}
 
     /* BUTTON */
-    .btn {
-      width:100%; padding:18px; border:none; border-radius:18px;
-      font-family:'Syne',sans-serif; font-size:16px; font-weight:800;
-      letter-spacing:0.5px; cursor:pointer;
-      transition:transform 0.1s, box-shadow 0.25s;
+    .btn{
+      width:100%;padding:17px;border:none;border-radius:18px;
+      font-family:'Syne',sans-serif;font-size:16px;font-weight:800;
+      letter-spacing:0.5px;cursor:pointer;
+      transition:transform 0.1s,box-shadow 0.25s;
     }
-    .btn:active { transform:scale(0.97); }
-    .btn-start {
-      background:linear-gradient(135deg,#f4a227,#e8734a);
-      color:#0f0e17;
-      box-shadow:0 6px 28px rgba(244,162,39,0.35);
-    }
-    .btn-stop {
-      background:var(--card); color:var(--text);
-      border:1px solid rgba(255,255,255,0.08);
-    }
+    .btn:active{transform:scale(0.97);}
+    .btn-start{background:linear-gradient(135deg,#f4a227,#e8734a);color:#0f0e17;box-shadow:0 6px 28px rgba(244,162,39,0.35);}
+    .btn-stop{background:var(--card);color:var(--text);border:1px solid rgba(255,255,255,0.08);}
 
-    .footnote {
-      text-align:center; font-size:11px;
-      color:var(--muted); opacity:0.55; line-height:1.6;
-    }
+    .footnote{text-align:center;font-size:11px;color:var(--muted);opacity:0.5;line-height:1.6;}
 
-    /* POPUP */
-    #popup {
-      position:fixed; inset:0; z-index:999;
-      display:flex; align-items:flex-start; justify-content:center;
-      padding-top: max(env(safe-area-inset-top,0px), 24px);
+    /* IN-APP POPUP */
+    #popup{
+      position:fixed;inset:0;z-index:999;
+      display:flex;align-items:flex-start;justify-content:center;
+      padding-top:max(env(safe-area-inset-top,0px),24px);
       pointer-events:none;
     }
-    .pbox {
+    .pbox{
       background:linear-gradient(135deg,#f4a227,#e8734a);
-      border-radius:22px; padding:16px 22px;
-      display:flex; align-items:center; gap:14px;
-      box-shadow:0 20px 60px rgba(244,162,39,0.55), 0 4px 20px rgba(0,0,0,0.5);
-      max-width:340px; width:calc(100% - 48px);
-      opacity:0;
-      transform:translateY(-36px) scale(0.88);
-      transition:none;
+      border-radius:22px;padding:16px 22px;
+      display:flex;align-items:center;gap:14px;
+      box-shadow:0 20px 60px rgba(244,162,39,0.55),0 4px 20px rgba(0,0,0,0.5);
+      max-width:340px;width:calc(100% - 48px);
+      opacity:0;transform:translateY(-36px) scale(0.88);transition:none;
     }
-    .pbox.show {
-      transition:opacity 0.45s cubic-bezier(0.34,1.56,0.64,1),
-                 transform 0.45s cubic-bezier(0.34,1.56,0.64,1);
-      opacity:1; transform:translateY(0) scale(1);
+    .pbox.show{
+      transition:opacity 0.45s cubic-bezier(0.34,1.56,0.64,1),transform 0.45s cubic-bezier(0.34,1.56,0.64,1);
+      opacity:1;transform:translateY(0) scale(1);
     }
-    .pbox.hide {
-      transition:opacity 0.3s ease, transform 0.3s ease;
-      opacity:0; transform:translateY(-18px) scale(0.94);
+    .pbox.hide{
+      transition:opacity 0.3s ease,transform 0.3s ease;
+      opacity:0;transform:translateY(-18px) scale(0.94);
     }
-    .picon { font-size:30px; flex-shrink:0; }
-    .ptitle {
-      font-family:'Syne',sans-serif; font-size:16px;
-      font-weight:800; color:#0f0e17;
-    }
-    .psub { font-size:12px; color:rgba(15,14,23,0.6); margin-top:2px; }
+    .picon{font-size:30px;flex-shrink:0;}
+    .ptitle{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#0f0e17;}
+    .psub{font-size:12px;color:rgba(15,14,23,0.6);margin-top:2px;}
   </style>
 </head>
 <body>
-
 <div class="blob b1"></div>
 <div class="blob b2"></div>
 
-<!-- POPUP -->
+<!-- IN-APP POPUP (shows when app is visible) -->
 <div id="popup">
   <div class="pbox" id="pbox">
     <div class="picon">📰</div>
@@ -236,6 +187,17 @@
     <p>Never miss a newspaper refresh again</p>
   </div>
 
+  <!-- NOTIFICATION PERMISSION BANNER -->
+  <div class="notif-banner pending" id="notifBanner">
+    <div class="notif-icon" id="notifIcon">🔔</div>
+    <div class="notif-text">
+      <div class="notif-title" id="notifTitle">Enable Notifications</div>
+      <div class="notif-sub" id="notifSub">Required to alert you while playing HayDay</div>
+    </div>
+    <button class="notif-btn" id="notifBtn" onclick="requestNotifPermission()">Allow</button>
+  </div>
+
+  <!-- STATUS -->
   <div class="status-card" id="statusCard">
     <div class="slabel">Status</div>
     <div class="smain idle" id="smain">Tap Start to begin</div>
@@ -244,9 +206,9 @@
     </div>
   </div>
 
+  <!-- SETTINGS -->
   <div class="settings-card">
     <div class="stitle">Settings</div>
-
     <div class="srow">
       <div class="sinfo">
         <div class="sname">Refresh Interval</div>
@@ -258,9 +220,7 @@
         <button onclick="changeInterval(1)">+</button>
       </div>
     </div>
-
     <div class="divider"></div>
-
     <div class="srow">
       <div class="sinfo">
         <div class="sname">Alert Before</div>
@@ -276,157 +236,194 @@
 
   <button class="btn btn-start" id="mainBtn" onclick="toggleTimer()">🌾 &nbsp;Start Timer</button>
 
-  <div class="footnote">Keep this app open while playing.<br>Alerts only fire when you're here.</div>
+  <div class="footnote">
+    Notifies you even while playing HayDay 🎮
+  </div>
 
 </div>
 
 <script>
-  // ── STATE ──
-  let running          = false;
-  let startEpoch       = null;   // ms — moment user pressed Start
-  let intervalMin      = 5;      // newspaper refresh every N minutes
-  let alertBeforeSec   = 10;     // fire popup N seconds before refresh
-  let cycleCount       = 0;
-  let tickHandle       = null;
-  let shownForCycle    = -1;     // last cycle index we already alerted
-  let popupTimer       = null;
+// ── STATE ──
+let running        = false;
+let startEpoch     = null;
+let intervalMin    = 5;
+let alertBeforeSec = 10;
+let cycleCount     = 0;
+let shownForCycle  = -1;
+let popupTimer     = null;
+let swReg          = null;   // service worker registration
 
-  // ── SETTINGS ──
-  function changeInterval(d) {
-    if (running) return;
-    intervalMin = Math.max(1, Math.min(60, intervalMin + d));
-    document.getElementById('iVal').textContent = intervalMin + ' min';
+// ── SERVICE WORKER SETUP ──
+async function initSW() {
+  if (!('serviceWorker' in navigator)) return;
+  try {
+    swReg = await navigator.serviceWorker.register('./sw.js', { scope: './' });
+    // Listen for messages from SW (in-app popup trigger)
+    navigator.serviceWorker.addEventListener('message', e => {
+      if (e.data.type === 'SHOW_POPUP') showPopup(e.data.alertBeforeSec);
+    });
+  } catch(err) {
+    console.warn('SW registration failed:', err);
   }
-  function changeAlert(d) {
-    if (running) return;
-    alertBeforeSec = Math.max(5, Math.min(55, alertBeforeSec + d));
-    document.getElementById('aVal').textContent = alertBeforeSec + ' sec';
+}
+initSW();
+
+// ── NOTIFICATION PERMISSION ──
+function updateNotifBanner() {
+  const banner = document.getElementById('notifBanner');
+  const icon   = document.getElementById('notifIcon');
+  const title  = document.getElementById('notifTitle');
+  const sub    = document.getElementById('notifSub');
+  const btn    = document.getElementById('notifBtn');
+  const perm   = Notification.permission;
+
+  if (perm === 'granted') {
+    banner.className = 'notif-banner granted';
+    icon.textContent  = '✅';
+    title.textContent = 'Notifications Enabled';
+    sub.textContent   = 'You\'ll be alerted even while playing HayDay';
+    btn.style.display = 'none';
+  } else if (perm === 'denied') {
+    banner.className = 'notif-banner denied';
+    icon.textContent  = '❌';
+    title.textContent = 'Notifications Blocked';
+    sub.textContent   = 'Go to Chrome Settings → Site Settings → Notifications to allow';
+    btn.style.display = 'none';
+  } else {
+    banner.className = 'notif-banner pending';
+    icon.textContent  = '🔔';
+    title.textContent = 'Enable Notifications';
+    sub.textContent   = 'Required to alert you while playing HayDay';
+    btn.style.display = 'block';
   }
+}
 
-  // ── TOGGLE ──
-  function toggleTimer() {
-    running ? stopTimer() : startTimer();
+async function requestNotifPermission() {
+  const result = await Notification.requestPermission();
+  updateNotifBanner();
+}
+
+// Run on load
+if ('Notification' in window) updateNotifBanner();
+
+// ── SETTINGS ──
+function changeInterval(d) {
+  if (running) return;
+  intervalMin = Math.max(1, Math.min(60, intervalMin + d));
+  document.getElementById('iVal').textContent = intervalMin + ' min';
+  if (running) sendSWUpdate();
+}
+function changeAlert(d) {
+  if (running) return;
+  alertBeforeSec = Math.max(5, Math.min(55, alertBeforeSec + d));
+  document.getElementById('aVal').textContent = alertBeforeSec + ' sec';
+  if (running) sendSWUpdate();
+}
+
+// ── SEND MESSAGES TO SERVICE WORKER ──
+async function sendToSW(msg) {
+  if (!swReg) return;
+  const sw = swReg.active || swReg.installing || swReg.waiting;
+  if (sw) sw.postMessage(msg);
+}
+
+function sendSWUpdate() {
+  sendToSW({ type: 'UPDATE', intervalMin, alertBeforeSec });
+}
+
+// ── TOGGLE ──
+function toggleTimer() {
+  running ? stopTimer() : startTimer();
+}
+
+function startTimer() {
+  running       = true;
+  startEpoch    = Date.now();
+  cycleCount    = 0;
+  shownForCycle = -1;
+
+  document.getElementById('mainBtn').textContent = '⏹  Stop Timer';
+  document.getElementById('mainBtn').className   = 'btn btn-stop';
+  document.getElementById('statusCard').classList.add('running');
+  document.getElementById('cyclesRow').style.display = 'block';
+  document.getElementById('cycleCount').textContent  = '0';
+  setStatus('active', '● Timer Running');
+
+  // Tell service worker to start tracking
+  sendToSW({ type: 'START', startEpoch, intervalMin, alertBeforeSec });
+}
+
+function stopTimer() {
+  running = false;
+  document.getElementById('mainBtn').textContent = '🌾  Start Timer';
+  document.getElementById('mainBtn').className   = 'btn btn-start';
+  document.getElementById('statusCard').classList.remove('running');
+  document.getElementById('cyclesRow').style.display = 'none';
+  setStatus('idle', 'Tap Start to begin');
+
+  // Tell service worker to stop
+  sendToSW({ type: 'STOP' });
+}
+
+function setStatus(type, text) {
+  const el = document.getElementById('smain');
+  el.className = 'smain ' + type;
+  el.innerHTML = type === 'active' ? '<div class="dot"></div>' + text : text;
+}
+
+// ── IN-APP POPUP (when app is visible) ──
+function showPopup(sec) {
+  sec = sec || alertBeforeSec;
+  const box = document.getElementById('pbox');
+  document.getElementById('psub').textContent = 'Place your ad now — refresh in ~' + sec + 's!';
+
+  playChime();
+  if (navigator.vibrate) navigator.vibrate([120, 60, 120]);
+
+  if (popupTimer) clearTimeout(popupTimer);
+  box.classList.remove('show', 'hide');
+  void box.offsetWidth;
+  box.classList.add('show');
+
+  popupTimer = setTimeout(() => {
+    box.classList.replace('show', 'hide');
+    popupTimer = setTimeout(() => box.classList.remove('hide'), 350);
+  }, 2000);
+
+  // Also update cycle count
+  cycleCount++;
+  document.getElementById('cycleCount').textContent = cycleCount;
+}
+
+// ── CHIME ──
+function playChime() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [523.25, 659.25, 783.99].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const g   = ctx.createGain();
+      osc.connect(g); g.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.18);
+      g.gain.setValueAtTime(0, ctx.currentTime + i * 0.18);
+      g.gain.linearRampToValueAtTime(0.20, ctx.currentTime + i * 0.18 + 0.05);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.18 + 0.55);
+      osc.start(ctx.currentTime + i * 0.18);
+      osc.stop(ctx.currentTime + i * 0.18 + 0.55);
+    });
+    setTimeout(() => ctx.close(), 1600);
+  } catch(e) {}
+}
+
+// ── WAKE LOCK ──
+(async function() {
+  try { if ('wakeLock' in navigator) await navigator.wakeLock.request('screen'); } catch(e) {}
+})();
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'visible') {
+    try { await navigator.wakeLock.request('screen'); } catch(e) {}
   }
-
-  function startTimer() {
-    running      = true;
-    startEpoch   = Date.now();
-    cycleCount   = 0;
-    shownForCycle = -1;
-
-    document.getElementById('mainBtn').textContent  = '⏹  Stop Timer';
-    document.getElementById('mainBtn').className    = 'btn btn-stop';
-    document.getElementById('statusCard').classList.add('running');
-    document.getElementById('cyclesRow').style.display = 'block';
-    document.getElementById('cycleCount').textContent  = '0';
-    setStatus('active', '● Timer Running');
-
-    tickHandle = setInterval(tick, 500);
-  }
-
-  function stopTimer() {
-    running = false;
-    clearInterval(tickHandle); tickHandle = null;
-
-    document.getElementById('mainBtn').textContent  = '🌾  Start Timer';
-    document.getElementById('mainBtn').className    = 'btn btn-start';
-    document.getElementById('statusCard').classList.remove('running');
-    document.getElementById('cyclesRow').style.display = 'none';
-    setStatus('idle', 'Tap Start to begin');
-  }
-
-  function setStatus(type, text) {
-    const el = document.getElementById('smain');
-    el.className = 'smain ' + type;
-    el.innerHTML = type === 'active'
-      ? '<div class="dot"></div>' + text
-      : text;
-  }
-
-  // ── CORE TICK (runs every 500 ms) ──
-  function tick() {
-    if (!running) return;
-
-    // Only alert when the page is visible (user is "in the app")
-    if (document.hidden) return;
-
-    const now         = Date.now();
-    const elapsed     = now - startEpoch;                     // ms since Start pressed
-    const intervalMs  = intervalMin * 60 * 1000;
-    const alertMs     = alertBeforeSec * 1000;
-
-    // Which refresh cycle are we in?
-    const cycleIdx    = Math.floor(elapsed / intervalMs);
-
-    // How many ms until the NEXT refresh?
-    const posInCycle  = elapsed - cycleIdx * intervalMs;
-    const msLeft      = intervalMs - posInCycle;
-
-    // Fire if we are within the alert window AND haven't fired for this cycle yet
-    if (msLeft <= alertMs && shownForCycle !== cycleIdx) {
-      shownForCycle = cycleIdx;
-      cycleCount++;
-      document.getElementById('cycleCount').textContent = cycleCount;
-      showPopup();
-    }
-  }
-
-  // ── POPUP ──
-  function showPopup() {
-    const box  = document.getElementById('pbox');
-    const sub  = document.getElementById('psub');
-    sub.textContent = 'Place your ad now — refresh in ~' + alertBeforeSec + 's!';
-
-    playChime();
-    if (navigator.vibrate) navigator.vibrate([100, 60, 100]);
-
-    if (popupTimer) clearTimeout(popupTimer);
-
-    box.classList.remove('show', 'hide');
-    void box.offsetWidth;           // force reflow
-    box.classList.add('show');
-
-    popupTimer = setTimeout(() => {
-      box.classList.replace('show', 'hide');
-      popupTimer = setTimeout(() => box.classList.remove('hide'), 350);
-    }, 2000);
-  }
-
-  // ── PLEASANT CHIME (C–E–G major arpeggio) ──
-  function playChime() {
-    try {
-      const ctx   = new (window.AudioContext || window.webkitAudioContext)();
-      const notes = [523.25, 659.25, 783.99];   // C5, E5, G5
-      notes.forEach((freq, i) => {
-        const osc  = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.18);
-        gain.gain.setValueAtTime(0,    ctx.currentTime + i * 0.18);
-        gain.gain.linearRampToValueAtTime(0.20, ctx.currentTime + i * 0.18 + 0.05);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.18 + 0.55);
-        osc.start(ctx.currentTime + i * 0.18);
-        osc.stop(ctx.currentTime  + i * 0.18 + 0.55);
-      });
-      setTimeout(() => ctx.close(), 1600);
-    } catch(e) { /* silent fail */ }
-  }
-
-  // ── WAKE LOCK — keeps screen on ──
-  (async function keepAwake() {
-    try {
-      if ('wakeLock' in navigator) {
-        await navigator.wakeLock.request('screen');
-      }
-    } catch(e) {}
-  })();
-  document.addEventListener('visibilitychange', async () => {
-    if (document.visibilityState === 'visible') {
-      try { await navigator.wakeLock.request('screen'); } catch(e) {}
-    }
-  });
+});
 </script>
 </body>
 </html>
